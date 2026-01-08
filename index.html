@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Platformer Design Tool</title>
+  <meta name="description" content="Plan and test your platformer levels" />
+  
+  <link rel="stylesheet" href="src/style.css">
+</head>
+
+<body>
+  <div id="stars"></div>
+
+<div class="grid-controls">
+  <button id="toggleGridPanel" class="panel-toggle" title="Toggle Grid Controls">⚙️</button>
+  <div class="grid-controls-content">
+    <div class="control-row">
+      <label class="toggle-label">
+        <span>Grid (off/on): </span>
+        <input type="checkbox" id="gridToggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="control-row">
+      <label for="gridSize">Size: <span id="gridSizeValue">50</span>px</label>
+      <input type="range" id="gridSize" min="10" max="100" value="50" step="10">
+    </div>
+    <div class="control-row">
+      <label class="toggle-label">
+        <span>Coords (off/on): </span>
+        <input type="checkbox" id="coordsToggle">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+  <div class="container">
+    <!-- TAB BUTTONS -->
+    <div class="tab-container">
+      <button class="tab-button active" data-tab="map">LEVEL PLANNER</button>
+      <button class="tab-button" data-tab="physics">PHYSICS TESTER</button>
+    </div>
+
+    <!-- TAB 1: MAP PLANNER -->
+    <div id="mapTab" class="tab-content active">
+      <div class="canvas-container">
+        <canvas id="mapCanvas" width="1000" height="480"></canvas>
+        <div class="hint">
+        </div>
+      </div>
+
+      <div class="inputs-wrapper">
+        <div class="input-box">
+          <h2>Level Settings</h2>
+          <div class="control-group">
+            <label for="levelLength">Level Length (px)</label>
+            <input id="levelLength" type="number" value="10000" min="1000" step="100">
+          </div>
+          <div class="control-group">
+            <label for="numPlatforms"># of Platforms</label>
+            <input id="numPlatforms" type="number" value="3" min="0">
+          </div>
+          <div class="control-group">
+            <label for="numHoles"># of Holes</label>
+            <input id="numHoles" type="number" value="1" min="0">
+          </div>
+          
+          <div class="control-group">
+            <label for="platformColor">Platform Color</label>
+            <div class="color-select-wrapper">
+              <select id="platformColor">
+                <option value="#830cde">Vortex Violet</option>
+                <option value="#830CDE">Plasma Purple</option>
+                <option value="#dc4ce8" selected>Nuclear Fuscia</option>
+                <option value="#FFC7FF">Particle Pink</option>
+                <option value="#67FEBD">Alpha Aqua</option>
+                <option value="#00ffff">Aqua Aura</option>
+                <option value="#58e84c">Radioactive Green</option>
+                <option value="#FFFFFF">White</option>
+                <option value="#37025a">Proton Purple</option>
+                <option value="#170032">Boson Blue</option>
+                <option value="#F3FFE5">Halflife Lime</option>
+                <option value="#9090C0">Grey-Blue Duality</option>
+                <option value="#DBE2E9">Gamma Grey</option>
+                <option value="#8391A1">Gravity Grey</option>
+                <option value="#2A3439">Dark Matter Grey</option>
+              </select>
+              <div id="platformSwatch" class="color-swatch" style="background: #dc4ce8;"></div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="groundColor">Ground Color</label>
+            <div class="color-select-wrapper">
+              <select id="groundColor">
+                <option value="#830cde">Vortex Violet</option>
+                <option value="#830CDE">Plasma Purple</option>
+                <option value="#dc4ce8">Nuclear Fuscia</option>
+                <option value="#FFC7FF">Particle Pink</option>
+                <option value="#67FEBD" selected>Alpha Aqua</option>
+                <option value="#00ffff">Aqua Aura</option>
+                <option value="#58e84c">Radioactive Green</option>
+                <option value="#FFFFFF">White</option>
+                <option value="#37025a">Proton Purple</option>
+                <option value="#170032">Boson Blue</option>
+                <option value="#F3FFE5">Halflife Lime</option>
+                <option value="#9090C0">Grey-Blue Duality</option>
+                <option value="#DBE2E9">Gamma Grey</option>
+                <option value="#8391A1">Gravity Grey</option>
+                <option value="#2A3439">Dark Matter Grey</option>
+              </select>
+              <div id="groundSwatch" class="color-swatch" style="background: #67FEBD;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-box">
+          <h2>Platforms & Holes</h2>
+          
+          <div class="control-group">
+            <label>Upload JSON (Optional)</label>
+            <input type="file" id="jsonUpload" accept=".json,.txt">
+          </div>
+
+          <div id="dynamicInputs"></div>
+          
+          <button id="generateLevel">GENERATE LEVEL</button>
+          <button id="exportJson">EXPORT JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: PHYSICS TESTER -->
+    <div id="physicsTab" class="tab-content">
+      <div class="canvas-container">
+        <canvas id="physicsCanvas" width="1000" height="480"></canvas>
+        <div class="hint">
+        </div>
+      </div>
+
+      <div class="inputs-wrapper">
+        <div class="input-box">
+          <h2>Physics Settings</h2>
+          <div class="control-group">
+            <label for="gravity">Gravity</label>
+            <input id="gravity" type="number" value="1600" step="0.1" min="0.1">
+          </div>
+          <div class="control-group">
+            <label for="jumpForce">Jump Force</label>
+            <input id="jumpForce" type="number" value="780" step="1" min="1">
+          </div>
+          <div class="control-group">
+            <label for="speed">Move Speed</label>
+            <input id="speed" type="number" value="250" step="1" min="1">
+          </div>
+        </div>
+
+        <div class="input-box">
+          <h2>Character Size</h2>
+          <div class="control-group">
+            <label for="spriteW">Width (1-200)</label>
+            <input type="number" id="spriteW" value="150" min="1" max="200">
+          </div>
+          <div class="control-group">
+            <label for="spriteH">Height (1-200)</label>
+            <input type="number" id="spriteH" value="108" min="1" max="200">
+          </div>
+
+          <button id="loadPhysics">LOAD & TEST PHYSICS</button>
+          <button id="resetPlayer">RESET PLAYER</button>
+        </div>
+      </div>
+    </div>
+
+<div id="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
+        <a href="javascript:void(0);" class="button-container" aria-label="Scroll to top">
+            <img src="public/sprites/top.png" alt="Scroll to top">
+ 
+        </a>
+</div>
+
+  </div>
+
+  <script src="src/platformKitty.js"></script>
+  <script src="src/ui.js"></script>
+
+ 
+</body>
+</html>
