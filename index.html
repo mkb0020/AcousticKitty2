@@ -12,27 +12,84 @@
 <body>
   <div id="stars"></div>
 
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="left-dropdown"><!-- LEFT DROPDOWN MENU -->
+          <img src="public/sprites/Niels2.png" alt="Menu" class="home-icon">
+      </div>
+       <a href="https://mkb0020.github.io">
+            <div class="logo">♡ ACOUSTIC KITTY ♡</div>  <!-- CENTER LOGO -->
+        </a>
+      <div class="help-dropdown"> <!-- RIGHT HELP DROPDOWN -->
+        <button class="help-icon" id="helpBtn" aria-label="Help Menu">
+          <div class="question-mark">?</div>
+        </button>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <button id="openMainHelp">GUIDE</button>
+          <button id="openGuide">SUPPORT</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
 <div class="grid-controls">
   <button id="toggleGridPanel" class="panel-toggle" title="Toggle Grid Controls">⚙️</button>
   <div class="grid-controls-content">
+
+  <div class="control-row">
+      <span class="divider-label">CANVAS </span>
+  </div>
+
     <div class="control-row">
       <label class="toggle-label">
-        <span>Grid (off/on): </span>
+        <span>Grid</span>
         <input type="checkbox" id="gridToggle" checked>
         <span class="toggle-slider"></span>
       </label>
     </div>
     <div class="control-row">
-      <label for="gridSize">Size: <span id="gridSizeValue">50</span>px</label>
+      <label for="gridSize">Grid Size: <span id="gridSizeValue">50</span>px</label>
       <input type="range" id="gridSize" min="10" max="100" value="50" step="10">
     </div>
     <div class="control-row">
       <label class="toggle-label">
-        <span>Coords (off/on): </span>
+        <span>Mouse Coords </span>
         <input type="checkbox" id="coordsToggle">
         <span class="toggle-slider"></span>
       </label>
     </div>
+
+  <div class="control-row">
+      <span class="divider-label">jump arcs </span>
+  </div>
+
+
+  <div class="control-row">
+    <label class="toggle-label">
+      <span>Predict (Standing) </span>
+      <input type="checkbox" id="arcStandingToggle" checked>
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <div class="control-row">
+    <label class="toggle-label">
+      <span>Predict (Moving) </span>
+      <input type="checkbox" id="arcMovingToggle" checked>
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <div class="control-row">
+    <label class="toggle-label">
+      <span>Recorded Arc </span>
+      <input type="checkbox" id="arcRecordedToggle" checked>
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+
   </div>
 </div>
 
@@ -41,6 +98,7 @@
     <div class="tab-container">
       <button class="tab-button active" data-tab="map">LEVEL PLANNER</button>
       <button class="tab-button" data-tab="physics">PHYSICS TESTER</button>
+      <button class="tab-button" data-tab="PLACEHOLDER">BACK TO MENU</button>
     </div>
 
     <!-- TAB 1: MAP PLANNER -->
@@ -91,25 +149,11 @@
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="control-group"> <!-- THIS NEEDS TO BE REMOVED -->
             <label for="groundColor">Ground Color</label>
             <div class="color-select-wrapper">
               <select id="groundColor">
-                <option value="#830cde">Vortex Violet</option>
-                <option value="#830CDE">Plasma Purple</option>
-                <option value="#dc4ce8">Nuclear Fuscia</option>
-                <option value="#FFC7FF">Particle Pink</option>
                 <option value="#67FEBD" selected>Alpha Aqua</option>
-                <option value="#00ffff">Aqua Aura</option>
-                <option value="#58e84c">Radioactive Green</option>
-                <option value="#FFFFFF">White</option>
-                <option value="#37025a">Proton Purple</option>
-                <option value="#170032">Boson Blue</option>
-                <option value="#F3FFE5">Halflife Lime</option>
-                <option value="#9090C0">Grey-Blue Duality</option>
-                <option value="#DBE2E9">Gamma Grey</option>
-                <option value="#8391A1">Gravity Grey</option>
-                <option value="#2A3439">Dark Matter Grey</option>
               </select>
               <div id="groundSwatch" class="color-swatch" style="background: #67FEBD;"></div>
             </div>
@@ -181,6 +225,50 @@
         </a>
 </div>
 
+  </div>
+
+
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title">PLATFORMER PLANNER</h1>
+        <button class="modal-close" id="closeModal">X</button>
+      </div>
+      <div class="modal-body">
+        <h3>PLACEHOLDER</h3>
+        <p>Plan out platformer levels!</p>
+        
+        <h3>Tabs:</h3>
+        <ul>
+          <li><strong>Tab 1 - Level Planner:</strong> upload json or input platform and hole locations to plan your level</li>
+          <li><strong>Tab 2 - Physics Tester:</strong> test your plannned level with your game physics</li>
+
+        </ul>
+
+        <h3>Controls:</h3>
+        <ul>
+          <li><strong>Grid:</strong> ...</li>
+          <li><strong>Mouse Coordinates:</strong> ...</li>
+          <li><strong>Jump Arcs:</strong> ...</li>
+
+        </ul>
+
+        
+      </div>
+    </div>
+  </div>
+
+    <div id="guideModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title">SUPPORT</h1>
+        <button class="modal-close" id="closeGuide">X</button>
+      </div>
+      <div class="modal-body">
+        <h3>PLACEHOLDER</h3>
+          <p>Report issues at https://mkb0020.vercel.app/support</p>
+      </div>
+    </div>
   </div>
 
   <script src="src/platformKitty.js"></script>
