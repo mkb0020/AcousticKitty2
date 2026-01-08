@@ -130,8 +130,8 @@ body, html {
   padding-bottom:  1rem;
   padding-right: 1rem;
   padding-left: 1rem;
-  height: 40px;
-  max-height:40px;
+  height: 30px;
+  max-height:30px;
 }
 
 .home-link {
@@ -143,8 +143,8 @@ body, html {
 }
 
 .home-icon {
-  width: 38px;
-  height: 38px;
+  width: 28px;
+  height: 28px;
   top: 50%;
   mask: none !important;
   -webkit-mask: none !important;
@@ -162,7 +162,7 @@ body, html {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   background: linear-gradient(45deg, var(--ParticlePink), var(--NuclearFuscia), var(--AlphaAqua));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -636,8 +636,8 @@ body, html {
     }
 
     .container {
-      max-width: 1400px;
-      padding: 30px;
+      max-width: 1200px;
+      padding: 50px;
       margin: auto;
       z-index: 10;
     }
@@ -657,6 +657,7 @@ body, html {
       justify-content: center;
       gap: 20px;
       margin-bottom: 30px;
+  
     }
 
     .tab-button {
@@ -707,6 +708,7 @@ body, html {
 
     canvas {
       background: transparent;
+      backdrop-filter: blur(2px);
       border: 3px solid transparent;
       border-image: linear-gradient(45deg, var(--AquaAura), var(--NuclearFuscia)) 1;
       border-radius: 10px;
@@ -883,24 +885,23 @@ body, html {
     }
 
 /* ============= GRID ================*/
-
 .grid-controls {
   position: fixed;
-  top: 100px;
-  left: 50px;
+  top: 80px;
+  right: 50px;
   background: rgba(0, 0, 0, 0.95);
   border: 2px solid #67FEBD;
   border-radius: 12px;
   padding: 15px;
   z-index: 100;
   box-shadow: 0 4px 20px rgba(103, 254, 189, 0.3);
-  min-width: 280px;
+  min-width: 400;
   transition: all 0.3s ease;
 }
 
 .grid-controls-content {
   transition: all 0.3s ease;
-  max-height: 200px;
+  max-height: 500px;
   overflow: hidden;
 }
 
@@ -920,27 +921,37 @@ body, html {
   background: transparent;
   border: none;
   box-shadow: none;
-  
 }
 
 .control-row {
   margin-bottom: 12px;
 }
 
-
-
 .control-row:last-child {
   margin-bottom: 0;
 }
 
 .control-row label {
-  color: #67FEBD;
+  color: var(--CoolGray);
   font-size: 18px;
   display: block;
   margin-bottom: 6px;
 }
 
-
+.divider-label{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--NuclearFuscia);
+  font-size: 18px;
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 5px;
+  border-top: 2px dashed var(--PlasmaGlow2);
+  padding-top: 8px;
+  text-transform: uppercase;
+  font-size: 20px;
+}
 
 .toggle-label {
   display: flex;
@@ -956,31 +967,33 @@ body, html {
 
 .toggle-slider {
   position: relative;
-  width: 44px;
-  height: 24px;
-  background: #ffffff;
-  border-radius: 24px;
-  transition: background 0.3s;
+  width: 50px !important;
+  height: 26px !important;
+  background: #444444 !important;
+  border-radius: 26px !important;
+  transition: all 0.3s ease;
+  display: block !important;
 }
 
 .toggle-slider::before {
-  content: '';
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  top: 3px;
-  left: 3px;
-  transition: transform 0.3s;
+  content: '' !important;
+  position: absolute !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  top: 2px !important;
+  left: 2px !important;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 .toggle-label input:checked + .toggle-slider {
-  background: #67FEBD;
+  background: #67FEBD !important;
 }
 
 .toggle-label input:checked + .toggle-slider::before {
-  transform: translateX(20px);
+  transform: translateX(24px) !important;
 }
 
 #gridSize {
@@ -993,15 +1006,14 @@ body, html {
   color: var(--ParticlePink);
 }    
 
-
 .panel-toggle {
   position: absolute;
   top: -30px;
-  left: -30px;
-  width: 32px;
-  height: 32px;
+  right: -30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: #67FEBD;
+  background: var(--PlasmaPurple);
   border: 2px solid var(--CoolGray);
   cursor: pointer;
   font-size: 16px;
@@ -1013,12 +1025,14 @@ body, html {
 }
 
 .panel-toggle:hover {
-  background: #dc4ce8;
-  transform: rotate(90deg);
+  background: var(--NuclearFuscia);
 }
 
 .panel-toggle.collapsed {
   transform: rotate(180deg);
-  background: #dc4ce8;
+  background: var(--VortexViolet);
 }
 
+.panel-toggle.collapsed:hover {
+  background: var(--NuclearFuscia);
+}

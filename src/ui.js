@@ -228,6 +228,8 @@ const gridSizeValue = document.getElementById('gridSizeValue');
 const toggleGridPanel = document.getElementById('toggleGridPanel');
 const gridControlsContent = document.querySelector('.grid-controls-content');
 
+
+
 window.gridSettings = {
   enabled: true,
   size: 50
@@ -265,3 +267,22 @@ if (coordsToggle) {
     window.coordsSettings.enabled = coordsToggle.checked;
   });
 }
+
+//============================ JUMP ARCS ============================
+window.arcSettings = {
+  showStanding: true,
+  showMoving: true,
+  showRecorded: true
+};
+
+document.getElementById("arcStandingToggle").addEventListener("change", e => {
+  window.arcSettings.showStanding = e.target.checked;
+});
+
+document.getElementById("arcMovingToggle").addEventListener("change", e => {
+  window.arcSettings.showMoving = e.target.checked;
+});
+
+document.getElementById("arcRecordedToggle").addEventListener("change", e => {
+  window.arcSettings.showRecorded = e.target.checked;
+});

@@ -67,6 +67,10 @@ const generateBtn = document.getElementById('generateLevel');
 const exportBtn = document.getElementById('exportJson');
 const jsonUploadInput = document.getElementById('jsonUpload');
 
+
+
+
+
 function createDynamicInputs() {
   let html = '';
   const numP = parseInt(numPlatformsInput.value) || 0;
@@ -449,6 +453,14 @@ const physicsCtx = physicsCanvas.getContext("2d");
 
 const physicsGroundY = 440;
 
+let showStandingArc = true;
+let showMovingArc = true;
+let showRecordedArc = true;
+
+let jumpTrail = []; // FOR JUMP ARC
+const MAX_TRAIL_POINTS = 120;
+let previewJumpDir = 0; // -1 = left, 1 = right, 0 = none
+
 let player = {
   x: 50,
   y: physicsGroundY - 108,
@@ -464,6 +476,21 @@ const HITBOX_OFFSET_X = 0.15; // HITBOX OFFSET
 
 let physicsCamera = { x: 0 };
 const physicsKeys = {};
+
+window.addEventListener("keydown", e => { // FOR PREDICTIVE JUMP ARC
+  if (e.key === "m" || e.key === "M") previewJumpDir = 1;
+  if (e.key === "n" || e.key === "N") previewJumpDir = -1;
+});
+
+window.addEventListener("keyup", e => {
+  if (
+    e.key === "m" || e.key === "M" ||
+    e.key === "n" || e.key === "N"
+  ) {
+    previewJumpDir = 0;
+  }
+});
+
 
 const catSpriteSheet = new Image();
 catSpriteSheet.src = "public/sprites/cat.png";
@@ -591,7 +618,238 @@ function updatePhysics() {
   const targetCameraX = player.x - physicsCanvas.width / 3;
   physicsCamera.x += (targetCameraX - physicsCamera.x) * 0.1;
   physicsCamera.x = Math.max(0, physicsCamera.x);
+
+
+  // RECORD JUMP ARC
+  if (!player.onGround) {
+    jumpTrail.push({
+      x: player.x + player.w / 2,
+      y: player.y + player.h
+    });
+
+    if (jumpTrail.length > MAX_TRAIL_POINTS) {
+      jumpTrail.shift();
+    }
+  }
+
+  // CLEAR TRAIL WHEN LANDING
+  if (player.onGround && jumpTrail.length > 0) {
+    jumpTrail = [];
+  }
+
+
 }
+
+
+function predictJumpArc(cfg, forcedVx = null) {
+  const points = [];
+
+  let x = player.x + player.w / 2;
+  let y = player.y + player.h;
+
+  let vx = forcedVx !== null ? forcedVx : player.vx;
+  let vy = -cfg.jumpForce;
+
+  const dt = 0.016;
+  const maxSteps = 180;
+
+  let apex = { x, y };
+  let landing = null;
+
+  for (let i = 0; i < maxSteps; i++) {
+    vy += cfg.gravity * dt;
+    x += vx * dt;
+    y += vy * dt;
+
+    if (y < apex.y) apex = { x, y };
+
+    // Stop at ground
+    if (y >= physicsGroundY) {
+      landing = { x, y: physicsGroundY };
+      break;
+    }
+
+    // Stop at platform
+    for (let p of sharedLevelData.platforms) {
+      if (
+        x > p.x &&
+        x < p.x + p.w &&
+        y >= p.y &&
+        y <= p.y + p.h
+      ) {
+        landing = { x, y: p.y };
+        return { points, apex, landing };
+      }
+    }
+
+    points.push({ x, y });
+  }
+
+  return { points, apex, landing };
+}
+
+function drawRecordedArc() { // PINK JUMP ARC - TRACER ARC
+  if (jumpTrail.length > 1) {
+    physicsCtx.strokeStyle = "rgba(220, 76, 232, 0.6)";
+    physicsCtx.lineWidth = 2;
+    physicsCtx.beginPath();
+
+    jumpTrail.forEach((p, i) => {
+      if (i === 0) physicsCtx.moveTo(p.x, p.y);
+      else physicsCtx.lineTo(p.x, p.y);
+    });
+
+    physicsCtx.stroke();
+
+    // Optional dots
+    physicsCtx.fillStyle = "rgba(255, 199, 255, 1)";
+    jumpTrail.forEach(p => {
+      physicsCtx.beginPath();
+      physicsCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      physicsCtx.fill();
+    });
+  }
+}
+
+function drawStandingPredictionArc(){ // PURPLE JUMP ARC - PREDICT WHAT ARC WOULD BE AS IF PLAYER WERE MOVING
+  if ( 
+      player.onGround &&
+      player.vx === 0 &&
+      previewJumpDir !== 0
+    ) {
+      const cfg = getPhysicsConfig(); 
+      const fakeVx = previewJumpDir * cfg.speed;
+      const arc = predictJumpArc(cfg, fakeVx);
+
+      // ARC LINE
+      physicsCtx.strokeStyle = "rgb(131, 12, 222)";
+      physicsCtx.lineWidth = 2;
+      physicsCtx.beginPath();
+      arc.points.forEach((p, i) => {
+        if (i === 0) physicsCtx.moveTo(p.x, p.y);
+        else physicsCtx.lineTo(p.x, p.y);
+      });
+      physicsCtx.stroke();
+
+      // DOTS
+      physicsCtx.fillStyle = "rgb(165, 90, 255)";
+      arc.points.forEach(p => {
+        physicsCtx.beginPath();
+        physicsCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        physicsCtx.fill();
+      });
+
+      // APEX MARKER
+      physicsCtx.fillStyle = "rgb(255, 120, 255)";
+      physicsCtx.beginPath();
+      physicsCtx.arc(arc.apex.x, arc.apex.y, 5, 0, Math.PI * 2);
+      physicsCtx.fill();
+
+      // LANDING MARKER
+      if (arc.landing) {
+        physicsCtx.fillStyle = "rgb(180, 120, 255)";
+        physicsCtx.beginPath();
+        physicsCtx.arc(arc.landing.x, arc.landing.y, 5, 0, Math.PI * 2);
+        physicsCtx.fill();
+      }
+
+      // LABELS
+      physicsCtx.font = "12px Orbitron";
+      physicsCtx.fillStyle = "rgba(220, 200, 255, 0.95)";
+
+      physicsCtx.fillText(
+        `Apex X: ${Math.round(arc.apex.x)}`,
+        arc.apex.x + 8,
+        arc.apex.y - 18
+      );
+      physicsCtx.fillText(
+        `Apex Y: ${Math.round(arc.apex.y)}`,
+        arc.apex.x + 8,
+        arc.apex.y - 6
+      );
+
+      if (arc.landing) {
+        physicsCtx.fillText(
+          `Land X: ${Math.round(arc.landing.x)}`,
+          arc.landing.x - 40,
+          arc.landing.y + 20
+        );
+        physicsCtx.fillText(
+          `Land Y: ${Math.round(arc.landing.y)}`,
+          arc.landing.x - 40,
+          arc.landing.y + 34
+        );
+      }
+    }
+}
+  
+function drawMovingPredictionArc(){ // AQUA JUMP ARC - IN-MOTION PREDICT
+    if (player.onGround) { 
+      const cfg = getPhysicsConfig();
+      const arcData = predictJumpArc(cfg);
+      const startX = player.x + player.w / 2;
+      const startY = player.y + player.h;
+
+      // ARC LINE
+      physicsCtx.strokeStyle = "rgba(103, 254, 189, 0.8)";
+      physicsCtx.lineWidth = 2;
+      physicsCtx.beginPath();
+      arcData.points.forEach((p, i) => {
+        if (i === 0) physicsCtx.moveTo(p.x, p.y);
+        else physicsCtx.lineTo(p.x, p.y);
+      });
+      physicsCtx.stroke();
+
+      // APEX MARKER
+      physicsCtx.fillStyle = "#dc4ce8";
+      physicsCtx.beginPath();
+      physicsCtx.arc(arcData.apex.x, arcData.apex.y, 5, 0, Math.PI * 2);
+      physicsCtx.fill();
+
+      // MAX X MARKER
+      physicsCtx.fillStyle = "#67FEBD";
+      physicsCtx.beginPath();
+      physicsCtx.arc(arcData.maxX, physicsGroundY, 5, 0, Math.PI * 2);
+      physicsCtx.fill();
+
+      // GUIDE LINES
+      physicsCtx.setLineDash([6, 6]);
+      physicsCtx.strokeStyle = "rgba(220, 76, 232, 0.6)";
+      physicsCtx.lineWidth = 1;
+
+      // HEIGHT
+      physicsCtx.beginPath();
+      physicsCtx.moveTo(startX, startY);
+      physicsCtx.lineTo(startX, arcData.apex.y);
+      physicsCtx.stroke();
+
+      // DISTANCE
+      physicsCtx.beginPath();
+      physicsCtx.moveTo(startX, physicsGroundY);
+      physicsCtx.lineTo(arcData.maxX, physicsGroundY);
+      physicsCtx.stroke();
+
+      physicsCtx.setLineDash([]);
+
+      // LABELS
+      physicsCtx.fillStyle = "rgba(220, 76, 232, 0.9)";
+      physicsCtx.font = "12px Orbitron";
+      physicsCtx.fillText(
+        `Apex Y: ${Math.round(arcData.apex.y)} px`,
+        arcData.apex.x + 8,
+        arcData.apex.y - 8
+      );
+
+
+      physicsCtx.fillText(
+        `Max Distance: ${Math.round(Math.abs(arcData.maxX - startX))} px`,
+        arcData.maxX - 40,
+        physicsGroundY + 20
+      );
+    }
+}
+
+
 
 function drawPhysics() {
   physicsCtx.clearRect(0, 0, physicsCanvas.width, physicsCanvas.height);
@@ -600,6 +858,8 @@ function drawPhysics() {
   physicsCtx.translate(-physicsCamera.x, 0);
 
 
+
+  const cfg = getPhysicsConfig();
     // GRID
   if (window.gridSettings && window.gridSettings.enabled) {
     const gridSize = window.gridSettings.size;
@@ -685,7 +945,23 @@ function drawPhysics() {
     physicsCtx.fillRect(player.x, player.y, player.w, player.h);
   }
 
-  physicsCtx.restore();
+
+  if (window.arcSettings && window.arcSettings.showStanding) {
+    drawStandingPredictionArc();
+  }
+
+  if (window.arcSettings && window.arcSettings.showMoving) {
+    drawMovingPredictionArc();
+  }
+
+  if (window.arcSettings && window.arcSettings.showRecorded) {
+    drawRecordedArc();
+  }
+
+
+    
+
+  physicsCtx.restore(); // END CAMERA TRANSFORM
 
   physicsCtx.fillStyle = "rgba(0, 255, 255, 0.8)";
   physicsCtx.font = "14px Orbitron";
