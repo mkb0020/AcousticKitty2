@@ -888,14 +888,14 @@ body, html {
 .grid-controls {
   position: fixed;
   top: 80px;
-  right: 50px;
+  right: 25px;
   background: rgba(0, 0, 0, 0.95);
   border: 2px solid #67FEBD;
   border-radius: 12px;
   padding: 15px;
   z-index: 100;
   box-shadow: 0 4px 20px rgba(103, 254, 189, 0.3);
-  min-width: 400;
+  min-width: 350px;
   transition: all 0.3s ease;
 }
 
@@ -961,6 +961,21 @@ body, html {
   user-select: none;
 }
 
+
+.toggle-info { /* PLACEHOLDER */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  color: var(--NuclearFuscia) !important;
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 5px;
+  text-transform: uppercase;
+  font-size: 15px !important
+}
+
 .toggle-label input[type="checkbox"] {
   display: none;
 }
@@ -1008,12 +1023,12 @@ body, html {
 
 .panel-toggle {
   position: absolute;
-  top: -30px;
-  right: -30px;
-  width: 40px;
-  height: 40px;
+  top: -25px;
+  right: -25px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: var(--PlasmaPurple);
+  background: var(--PlasmaGlow2);
   border: 2px solid var(--CoolGray);
   cursor: pointer;
   font-size: 16px;
@@ -1030,9 +1045,25 @@ body, html {
 
 .panel-toggle.collapsed {
   transform: rotate(180deg);
-  background: var(--VortexViolet);
+  background: transparent;
+  border: none;
 }
 
 .panel-toggle.collapsed:hover {
   background: var(--NuclearFuscia);
+}
+
+
+.controls-gif  {
+  width: 32px;
+  height: 35px;
+  top: 50%;
+  mask: none !important;
+  -webkit-mask: none !important;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  background: transparent;
+  border:2px dashed var(--NuclearFuscia);
+box-shadow: 0 4px 20px var(--PlasmaPurple);
+
 }

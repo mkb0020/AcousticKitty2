@@ -459,7 +459,7 @@ let showRecordedArc = true;
 
 let jumpTrail = []; // FOR JUMP ARC
 const MAX_TRAIL_POINTS = 120;
-let previewJumpDir = 0; // -1 = left, 1 = right, 0 = none
+let previewJumpDir = 0; 
 
 let player = {
   x: 50,
@@ -663,13 +663,13 @@ function predictJumpArc(cfg, forcedVx = null) {
 
     if (y < apex.y) apex = { x, y };
 
-    // Stop at ground
+    //  STOP AT GROUND
     if (y >= physicsGroundY) {
       landing = { x, y: physicsGroundY };
       break;
     }
 
-    // Stop at platform
+    // STOP  AT PLATFORM
     for (let p of sharedLevelData.platforms) {
       if (
         x > p.x &&
@@ -701,7 +701,6 @@ function drawRecordedArc() { // PINK JUMP ARC - TRACER ARC
 
     physicsCtx.stroke();
 
-    // Optional dots
     physicsCtx.fillStyle = "rgba(255, 199, 255, 1)";
     jumpTrail.forEach(p => {
       physicsCtx.beginPath();
@@ -885,23 +884,34 @@ function drawPhysics() {
   }
 
 
-  // GRASS
-  const groundWidth = physicsCanvas.width * 2;
-  const groundHeight = physicsCanvas.height - physicsGroundY;
-  const gradient = physicsCtx.createLinearGradient(0, physicsGroundY, 0, physicsCanvas.height);
-    gradient.addColorStop(0, '#2d5016');
-    gradient.addColorStop(1, '#1a2f0d');
-    physicsCtx.fillStyle = gradient;
-    physicsCtx.fillRect(physicsCamera.x, physicsGroundY, groundWidth, groundHeight);
+  // DANGER ZONES - AKA WHERE THE HOLE ARE
+    const visibleStart = physicsCamera.x;
+    const visibleEnd = physicsCamera.x + physicsCanvas.width;
+    
+    // MAKE ENTIRE GROUND RED FIRST
+    const dangerGradient = physicsCtx.createLinearGradient(0, physicsGroundY, 0, physicsCanvas.height);
+    dangerGradient.addColorStop(0, '#8B0000');
+    dangerGradient.addColorStop(1, '#4B0000');
+    physicsCtx.fillStyle = dangerGradient;
+    physicsCtx.fillRect(visibleStart, physicsGroundY, visibleEnd - visibleStart, physicsCanvas.height - physicsGroundY);
 
+    // GRASS - DRAW ONLY WHERE THERE AREN'T HOLES
+    sharedLevelData.groundSegments.forEach(seg => {
+      const gradient = physicsCtx.createLinearGradient(0, seg.y, 0, seg.y + seg.height);
+      gradient.addColorStop(0, '#2d5016');
+      gradient.addColorStop(1, '#1a2f0d');
+      physicsCtx.fillStyle = gradient;
+      physicsCtx.fillRect(seg.x, seg.y, seg.width, seg.height);
 
-  physicsCtx.fillStyle = '#3d6020';
-  const grassDensity = Math.ceil(groundWidth / 100);
-  for (let i = 0; i < grassDensity; i++) {
-    const x = physicsCamera.x + (i / grassDensity) * groundWidth;
-    physicsCtx.fillRect(x, physicsGroundY + 10, 30, 5);
-    physicsCtx.fillRect(x + 20, physicsGroundY + 30, 40, 3);
-  }
+      physicsCtx.fillStyle = '#3d6020';
+      const grassDensity = Math.ceil(seg.width / 100);
+      for (let i = 0; i < grassDensity; i++) {
+        const x = seg.x + (i / grassDensity) * seg.width;
+        physicsCtx.fillRect(x, seg.y + 10, 30, 5);
+        physicsCtx.fillRect(x + 20, seg.y + 30, 40, 3);
+      }
+    });
+
 
 
 
