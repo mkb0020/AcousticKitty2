@@ -2,7 +2,8 @@
 let sharedLevelData = {
   platforms: [],
   groundSegments: [],
-  levelLength: 10000
+  levelLength: 20000,
+  zones: []
 };
 
 // ============================================ TAB 1: MAP PLANNER ============================================
@@ -66,7 +67,8 @@ const dynamicInputsDiv = document.getElementById('dynamicInputs');
 const generateBtn = document.getElementById('generateLevel');
 const exportBtn = document.getElementById('exportJson');
 const jsonUploadInput = document.getElementById('jsonUpload');
-
+const numZonesInput = document.getElementById('numZones');
+const dynamicZonesDiv = document.getElementById('dynamicZones');
 
 
 
@@ -106,6 +108,29 @@ function createDynamicInputs() {
 
   dynamicInputsDiv.innerHTML = html;
 }
+
+function createZoneInputs() {
+  let html = '';
+  const numZ = parseInt(numZonesInput.value) || 0;
+
+  if (numZ > 0) {
+    html += '<div style="margin-bottom: 20px;"><div class="row" style="grid-template-columns: 1fr 1fr 1fr 2fr;"><div class="label-header">Start X</div><div class="label-header">End X</div><div class="label-header">Color</div><div class="label-header">Label</div></div>';
+    for (let i = 0; i < numZ; i++) {
+      html += `<div class="row" style="grid-template-columns: 1fr 1fr 1fr 2fr;">
+        <input type="number" class="zone-start" value="0" step="50">
+        <input type="number" class="zone-end" value="500" step="50">
+        <input type="color" class="zone-color" value="#ff6b6b">
+        <input type="text" class="zone-label" placeholder="Zone ${i + 1}" value="Zone ${i + 1}">
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  dynamicZonesDiv.innerHTML = html;
+}
+
+numZonesInput.addEventListener('input', createZoneInputs);
+createZoneInputs();
 
 numPlatformsInput.addEventListener('input', createDynamicInputs);
 numHolesInput.addEventListener('input', createDynamicInputs);
@@ -163,6 +188,10 @@ jsonUploadInput.addEventListener('change', async (e) => {
       // PLATFORMS
       numPlatformsInput.value = data.platforms.length;
       
+    if (data.zones && Array.isArray(data.zones)) {
+            numZonesInput.value = data.zones.length;
+          }
+
       // HOLES
       if (data.GroundSegments && Array.isArray(data.GroundSegments)) {
         const holes = [];
@@ -208,6 +237,19 @@ jsonUploadInput.addEventListener('change', async (e) => {
           });
         }
         
+
+        // ZONES
+        if (data.zones) {
+          document.querySelectorAll('.zone-start').forEach((el, i) => {
+            if (data.zones[i]) {
+              el.value = data.zones[i].start;
+              document.querySelectorAll('.zone-end')[i].value = data.zones[i].end;
+              document.querySelectorAll('.zone-color')[i].value = data.zones[i].color;
+              document.querySelectorAll('.zone-label')[i].value = data.zones[i].label;
+            }
+          });
+        }
+
         generateBtn.click();
       }, 50);
       
@@ -263,6 +305,24 @@ generateBtn.onclick = () => {
     });
   }
 
+
+
+// GENERATE ZONES
+  sharedLevelData.zones = [];
+  document.querySelectorAll('.zone-start').forEach((el, i) => {
+    const start = parseFloat(el.value) || 0;
+    const end = parseFloat(document.querySelectorAll('.zone-end')[i].value) || 500;
+    const color = document.querySelectorAll('.zone-color')[i].value || '#ff6b6b';
+    const label = document.querySelectorAll('.zone-label')[i].value || `Zone ${i + 1}`;
+    
+    if (start < end) {
+      sharedLevelData.zones.push({ start, end, color, label });
+    }
+  });
+
+
+
+
   ufo.x = 100;
   ufo.y = mapCanvas.height / 2;
   mapCamera.x = 0;
@@ -270,11 +330,12 @@ generateBtn.onclick = () => {
 };
 
 exportBtn.onclick = () => {
-  const data = {
+const data = {
     GroundSegments: sharedLevelData.groundSegments,
     platforms: sharedLevelData.platforms.map(p => ({
       x: p.x, y: p.y, w: p.w, h: p.h
-    }))
+    })),
+    zones: sharedLevelData.zones
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -344,6 +405,16 @@ function drawMap() {
   mapCtx.save();
   mapCtx.translate(-mapCamera.x, 0);
 
+// DRAW ZONES IN BG
+  sharedLevelData.zones.forEach(zone => {
+    mapCtx.fillStyle = zone.color + '4D'; 
+    mapCtx.fillRect(zone.start, 0, zone.end - zone.start, mapCanvas.height);
+    
+    //DRAW ZONE LABEL
+    mapCtx.fillStyle = zone.color;
+    mapCtx.font = "bold 16px Orbitron";
+    mapCtx.fillText(zone.label, zone.start + 10, 30);
+  });
 
   if (window.gridSettings && window.gridSettings.enabled) {
     const gridSize = window.gridSettings.size;
@@ -856,7 +927,16 @@ function drawPhysics() {
   physicsCtx.save();
   physicsCtx.translate(-physicsCamera.x, 0);
 
-
+   // DRAW ZONES IN BG
+  sharedLevelData.zones.forEach(zone => {
+    physicsCtx.fillStyle = zone.color + '4D'; 
+    physicsCtx.fillRect(zone.start, 0, zone.end - zone.start, physicsCanvas.height);
+    
+    // DRAW ZONE LABEL
+    physicsCtx.fillStyle = zone.color;
+    physicsCtx.font = "bold 16px Orbitron";
+    physicsCtx.fillText(zone.label, zone.start + 10, 30);
+  });
 
   const cfg = getPhysicsConfig();
     // GRID
