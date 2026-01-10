@@ -43,6 +43,21 @@ export class MapRenderer {
     }
   }
 
+  drawZones(zones) {
+    if (zones && zones.length > 0) {
+      zones.forEach(zone => {
+        this.ctx.fillStyle = zone.color + '4D'; // Add transparency
+        this.ctx.fillRect(zone.start, 0, zone.end - zone.start, this.canvas.height);
+        
+        // Draw zone label
+        this.ctx.fillStyle = zone.color;
+        this.ctx.font = "bold 16px Orbitron";
+        this.ctx.fillText(zone.label, zone.start + 10, 30);
+      });
+    }
+  }
+
+
   drawGround(groundSegments) {
     groundSegments.forEach(seg => {
       const gradient = this.ctx.createLinearGradient(0, seg.y, 0, seg.y + seg.height);

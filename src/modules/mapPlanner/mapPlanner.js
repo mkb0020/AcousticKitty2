@@ -39,9 +39,11 @@ export class MapPlanner {
   initInputs() {
     this.levelLengthInput = document.getElementById('levelLength');
     this.numPlatformsInput = document.getElementById('numPlatforms');
-    this.numHolesInput = document.getElementById('numHoles');
+    this.numGroundSegmentsInput = document.getElementById('numGroundSegments');
+    this.numZonesInput = document.getElementById('numZones');
     this.platformColorInput = document.getElementById('platformColor');
     this.dynamicInputsDiv = document.getElementById('dynamicInputs');
+    this.dynamicZonesDiv = document.getElementById('dynamicZones');
     this.generateBtn = document.getElementById('generateLevel');
     this.exportBtn = document.getElementById('exportJson');
     this.jsonUploadInput = document.getElementById('jsonUpload');
@@ -49,7 +51,8 @@ export class MapPlanner {
 
   initEventListeners() {
     this.numPlatformsInput.addEventListener('input', () => this.createDynamicInputs());
-    this.numHolesInput.addEventListener('input', () => this.createDynamicInputs());
+    this.numGroundSegmentsInput.addEventListener('input', () => this.createDynamicInputs());
+    this.numZonesInput.addEventListener('input', () => this.createZoneInputs());
     this.generateBtn.onclick = () => this.generateLevel();
     this.exportBtn.onclick = () => this.exportJson();
     this.jsonUploadInput.addEventListener('change', (e) => this.handleJsonUpload(e));
@@ -71,15 +74,17 @@ export class MapPlanner {
     window.addEventListener("keyup", e => this.keys[e.key] = false);
     
     this.createDynamicInputs();
+    this.createZoneInputs();
   }
 
   createDynamicInputs() {
     let html = '';
     const numP = parseInt(this.numPlatformsInput.value) || 0;
-    const numH = parseInt(this.numHolesInput.value) || 0;
+    const numG = parseInt(this.numGroundSegmentsInput.value) || 0;
 
     if (numP > 0) {
-      html += '<div style="margin-bottom: 20px;"><div class="row"><div class="label-header">X</div><div class="label-header">Y</div><div class="label-header">Width</div><div class="label-header">Height</div></div>';
+      html += '<div style="margin-bottom: 20px;"><h3 style="color: #67FEBD; margin-bottom: 10px;">Platforms</h3>';
+      html += '<div class="row"><div class="label-header">X</div><div class="label-header">Y</div><div class="label-header">Width</div><div class="label-header">Height</div></div>';
       for (let i = 0; i < numP; i++) {
         html += `<div class="row">
           <input type="number" class="plat-x" value="${i === 0 ? 300 : 0}" step="10">
@@ -91,22 +96,43 @@ export class MapPlanner {
       html += '</div>';
     }
 
-    if (numH > 0) {
-      html += '<div><div class="row" style="grid-template-columns: 1fr 1fr;"><div class="label-header">Hole Start X</div><div class="label-header">Hole End X</div></div>';
-      for (let i = 0; i < numH; i++) {
-        html += `<div class="hole-row">
-          <input type="number" class="hole-start" value="${i === 0 ? 1000 : 0}" step="50">
-          <input type="number" class="hole-end" value="${i === 0 ? 1600 : 600}" step="50">
+    if (numG > 0) {
+      html += '<div style="margin-top: 20px;"><h3 style="color: #67FEBD; margin-bottom: 10px;">Ground Segments</h3>';
+      html += '<div class="row" style="grid-template-columns: 1fr 1fr;"><div class="label-header">Start X</div><div class="label-header">Width</div></div>';
+      for (let i = 0; i < numG; i++) {
+        html += `<div class="row" style="grid-template-columns: 1fr 1fr;">
+          <input type="number" class="ground-x" value="${i === 0 ? 0 : 1000}" step="50">
+          <input type="number" class="ground-w" value="${i === 0 ? 800 : 1000}" min="50" step="50">
         </div>`;
       }
       html += '</div>';
     }
 
-    if (numP === 0 && numH === 0) {
-      html = '<p style="color: rgba(255,255,255,0.6); text-align:center;">Add platforms or holes to get started!</p>';
+    if (numP === 0 && numG === 0) {
+      html = '<p style="color: rgba(255,255,255,0.6); text-align:center;">Add platforms or ground segments to get started!</p>';
     }
 
     this.dynamicInputsDiv.innerHTML = html;
+  }
+
+  createZoneInputs() {
+    let html = '';
+    const numZ = parseInt(this.numZonesInput.value) || 0;
+
+    if (numZ > 0) {
+      html += '<div style="margin-bottom: 20px;"><div class="row" style="grid-template-columns: 1fr 1fr 1fr 2fr;"><div class="label-header">Start X</div><div class="label-header">End X</div><div class="label-header">Color</div><div class="label-header">Label</div></div>';
+      for (let i = 0; i < numZ; i++) {
+        html += `<div class="row" style="grid-template-columns: 1fr 1fr 1fr 2fr;">
+          <input type="number" class="zone-start" value="0" step="50">
+          <input type="number" class="zone-end" value="500" step="50">
+          <input type="color" class="zone-color" value="#ff6b6b">
+          <input type="text" class="zone-label" placeholder="Zone ${i + 1}" value="Zone ${i + 1}">
+        </div>`;
+      }
+      html += '</div>';
+    }
+
+    this.dynamicZonesDiv.innerHTML = html;
   }
 
   async handleJsonUpload(e) {
@@ -118,22 +144,21 @@ export class MapPlanner {
       
       if (data.platforms && Array.isArray(data.platforms)) {
         this.numPlatformsInput.value = data.platforms.length;
-        
-        if (data.GroundSegments && Array.isArray(data.GroundSegments)) {
-          const holes = [];
-          let lastEnd = 0;
-          data.GroundSegments.forEach((seg) => {
-            if (seg.x > lastEnd) {
-              holes.push({ start: lastEnd, end: seg.x });
-            }
-            lastEnd = seg.x + seg.width;
-          });
-          this.numHolesInput.value = holes.length;
-        }
-        
-        this.createDynamicInputs();
-        
-        setTimeout(() => {
+      }
+      
+      if (data.GroundSegments && Array.isArray(data.GroundSegments)) {
+        this.numGroundSegmentsInput.value = data.GroundSegments.length;
+      }
+
+      if (data.zones && Array.isArray(data.zones)) {
+        this.numZonesInput.value = data.zones.length;
+      }
+      
+      this.createDynamicInputs();
+      this.createZoneInputs();
+      
+      setTimeout(() => {
+        if (data.platforms) {
           document.querySelectorAll('.plat-x').forEach((el, i) => {
             if (data.platforms[i]) {
               el.value = data.platforms[i].x || 0;
@@ -142,31 +167,31 @@ export class MapPlanner {
               document.querySelectorAll('.plat-h')[i].value = data.platforms[i].h || data.platforms[i].height || 20;
             }
           });
-          
-          if (data.GroundSegments) {
-            const holes = [];
-            let lastEnd = 0;
-            data.GroundSegments.forEach(seg => {
-              if (seg.x > lastEnd) {
-                holes.push({ start: lastEnd, end: seg.x });
-              }
-              lastEnd = seg.x + seg.width;
-            });
-            
-            document.querySelectorAll('.hole-start').forEach((el, i) => {
-              if (holes[i]) {
-                el.value = holes[i].start;
-                document.querySelectorAll('.hole-end')[i].value = holes[i].end;
-              }
-            });
-          }
-          
-          this.generateLevel();
-        }, 50);
+        }
         
-      } else {
-        alert("Invalid JSON format. Please provide a JSON with 'platforms' array.");
-      }
+        if (data.GroundSegments) {
+          document.querySelectorAll('.ground-x').forEach((el, i) => {
+            if (data.GroundSegments[i]) {
+              el.value = data.GroundSegments[i].x || 0;
+              document.querySelectorAll('.ground-w')[i].value = data.GroundSegments[i].width || 1000;
+            }
+          });
+        }
+
+        if (data.zones) {
+          document.querySelectorAll('.zone-start').forEach((el, i) => {
+            if (data.zones[i]) {
+              el.value = data.zones[i].start;
+              document.querySelectorAll('.zone-end')[i].value = data.zones[i].end;
+              document.querySelectorAll('.zone-color')[i].value = data.zones[i].color;
+              document.querySelectorAll('.zone-label')[i].value = data.zones[i].label;
+            }
+          });
+        }
+        
+        this.generateLevel();
+      }, 50);
+      
     } catch (err) {
       alert("Error parsing uploaded file: " + err.message);
     }
@@ -186,40 +211,37 @@ export class MapPlanner {
       });
     });
 
-    const holes = [];
-    document.querySelectorAll('.hole-start').forEach((el, i) => {
-      const start = parseFloat(el.value) || 0;
-      const end = parseFloat(document.querySelectorAll('.hole-end')[i].value) || 600;
-      if (start < end) holes.push({ start, end });
-    });
-    holes.sort((a, b) => a.start - b.start);
-
     const groundSegments = [];
-    let currentX = 0;
-    for (let hole of holes) {
-      if (hole.start > currentX) {
-        groundSegments.push({
-          x: currentX,
-          y: GROUND_Y,
-          width: hole.start - currentX,
-          height: GROUND_HEIGHT
-        });
-      }
-      currentX = Math.max(currentX, hole.end);
-    }
-    if (currentX < newLevelLength) {
+    document.querySelectorAll('.ground-x').forEach((el, i) => {
+      const x = parseFloat(el.value) || 0;
+      const width = Math.max(50, parseFloat(document.querySelectorAll('.ground-w')[i].value) || 1000);
       groundSegments.push({
-        x: currentX,
+        x: x,
         y: GROUND_Y,
-        width: newLevelLength - currentX,
+        width: width,
         height: GROUND_HEIGHT
       });
-    }
+    });
+
+    groundSegments.sort((a, b) => a.x - b.x);
+
+    const zones = [];
+    document.querySelectorAll('.zone-start').forEach((el, i) => {
+      const start = parseFloat(el.value) || 0;
+      const end = parseFloat(document.querySelectorAll('.zone-end')[i].value) || 500;
+      const color = document.querySelectorAll('.zone-color')[i].value || '#ff6b6b';
+      const label = document.querySelectorAll('.zone-label')[i].value || `Zone ${i + 1}`;
+      
+      if (start < end) {
+        zones.push({ start, end, color, label });
+      }
+    });
 
     updateLevelData({
       platforms,
       groundSegments,
-      levelLength: newLevelLength
+      levelLength: newLevelLength,
+      zones
     });
 
     this.ufo.reset(this.canvas.height);
@@ -232,7 +254,8 @@ export class MapPlanner {
       GroundSegments: levelData.groundSegments,
       platforms: levelData.platforms.map(p => ({
         x: p.x, y: p.y, w: p.w, h: p.h
-      }))
+      })),
+      zones: levelData.zones
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -309,6 +332,7 @@ export class MapPlanner {
   draw() {
     this.renderer.clear();
     this.renderer.drawWithCamera(this.camera, () => {
+      this.renderer.drawZones(levelData.zones);
       this.renderer.drawGrid(this.camera);
       this.renderer.drawGround(levelData.groundSegments);
       this.renderer.drawPlatforms(levelData.platforms, this.platformColor);
