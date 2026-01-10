@@ -14,10 +14,10 @@
 
   <nav class="navbar">
     <div class="nav-container">
-      <div class="left-dropdown">
-          <img src="/sprites/Niels2.png" alt="Menu" class="home-icon">
+      <div class="left-dropdown"> <!-- NOT ACTUALLY A DROP DOWN AT THE MOMENT - KEEPING THE DROP DOWN TAG FOR FUTURE PLANS -->
+          <img src="/sprites/Niels2.png" alt="Menu" class="nav-niels">
       </div>
-       <a href="https://mkb0020.github.io">
+       <a href="https://mkb0020.github.io"> <!-- PLACEHOLDER -->
             <div class="logo">♡ ACOUSTIC KITTY ♡</div>
         </a>
       <div class="help-dropdown">
@@ -86,7 +86,7 @@
   </div>
 
   <div class="notes-panel">
-    <button id="toggleNotesPanel" class="panel-toggle" title="Toggle Notes"><img src="public/sprites/pencil.png" alt="NOTES" class="pencil-img"></button>
+    <button id="toggleNotesPanel" class="panel-toggle" title="Toggle Notes"><img src="public/sprites/pencil2.png" alt="NOTES" class="pencil-img"></button>
   <div class="notes-content">
     <div class="control-row">
     </div>
@@ -100,7 +100,8 @@
 
   <div class="container">
       <div class="tab-container">
-        <button class="tab-button active" data-tab="map">LEVEL PLANNER</button>
+        <!--CHANGE THESE TO SMALLER ICONS RATHER THAN BIG  BUTTONS-->
+        <button class="tab-button active" data-tab="map">LEVEL PLANNER</button> 
         <button class="tab-button" data-tab="physics">PHYSICS TESTER</button>
         <button class="tab-button" data-tab="PLACEHOLDER">BACK TO MENU</button>
       </div>
@@ -173,10 +174,11 @@
             </div>
 
             <div id="dynamicInputs"></div>
-            
+  
             <button id="generateLevel">GENERATE LEVEL</button>
             <button id="previewLevel">PREVIEW FULL LEVEL</button>
             <button id="exportJson">EXPORT JSON</button>
+            <button id="resetLevel" class="button">RESET LEVEL</button>
           </div>
         </div>
       </div>
