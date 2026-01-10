@@ -49,6 +49,7 @@ export class MapPlanner {
     this.exportBtn = document.getElementById('exportJson');
     this.jsonUploadInput = document.getElementById('jsonUpload');
     this.previewLevelBtn = document.getElementById('previewLevel');
+    this.resetBtn = document.getElementById('resetLevel');
   }
 
   initEventListeners() {
@@ -59,6 +60,8 @@ export class MapPlanner {
     this.exportBtn.onclick = () => this.exportJson();
     this.previewLevelBtn.onclick = () => this.generateFullLevelPreview();
     this.jsonUploadInput.addEventListener('change', (e) => this.handleJsonUpload(e));
+    this.resetBtn.onclick = () => this.resetLevel();
+
     
     this.canvas.addEventListener('mousemove', (e) => {
       const rect = this.canvas.getBoundingClientRect();
@@ -261,6 +264,31 @@ export class MapPlanner {
     this.camera.x = 0;
     this.spawnCows();
   }
+
+  resetLevel() {
+    this.levelLengthInput.value = 10000;
+    this.numPlatformsInput.value = 0;
+    this.numGroundSegmentsInput.value = 0;
+    this.numZonesInput.value = 0;
+    this.platformColorInput.value = '#dc4ce8';
+    
+    this.jsonUploadInput.value = '';
+    
+    this.createDynamicInputs();
+    this.createZoneInputs();
+    
+    updateLevelData({
+      platforms: [],
+      groundSegments: [],
+      levelLength: 10000,
+      zones: []
+    });
+    
+    this.ufo.reset(this.canvas.height);
+    this.camera.x = 0;
+    this.cows = [];
+  }
+
 
   generateFullLevelPreview() {
     const previewCanvas = document.createElement('canvas');
