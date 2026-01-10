@@ -39,7 +39,7 @@ function init() {
     console.error("PhysicsTester init failed:", e);
   }
   
-p
+
   animate();
 }
 
