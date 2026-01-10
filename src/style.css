@@ -109,7 +109,7 @@ body, html {
 
 /* ============================ NAVBAR ============================ */
 .navbar {
-  position: fixed;
+  position: relative;
   top: 0;
   width: 100vw;
   background: linear-gradient(135deg, var(--BosonShadow) 0%, var(--ProtonShadow) 50%, var(--BosonShadow) 100%);
@@ -636,10 +636,11 @@ body, html {
     }
 
     .container {
-      max-width: 1200px;
-      padding: 50px;
+      max-width: 1300px;
+      padding: 10px;
       margin: auto;
       z-index: 10;
+  
     }
 
     h1 {
@@ -653,11 +654,13 @@ body, html {
 
     /* TAB SYSTEM */
     .tab-container {
+      position: relative;
       display: flex;
       justify-content: center;
       gap: 20px;
       margin-bottom: 30px;
-  
+      padding-right: 100px;
+      padding-left: 100px;
     }
 
     .tab-button {
@@ -742,7 +745,7 @@ body, html {
     .inputs-wrapper {
       display: flex;
       flex-wrap: wrap;
-      gap: 40px;
+      gap: 20px;
       justify-content: center;
       
     }
@@ -761,7 +764,7 @@ body, html {
     }
 
     .input-box h2 {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       color: var(--ParticlePink);
       margin-bottom: 20px;
       text-transform: uppercase;
@@ -776,7 +779,7 @@ body, html {
 
     label {
       display: block;
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: var(--AlphaAqua);
       margin-bottom: 6px;
       text-transform: uppercase;
@@ -799,15 +802,16 @@ body, html {
 
     .label-header {
       font-weight: bold;
-      color: var(--AlphaAqua);
+      color: var(--AquaAura);
       text-transform: uppercase;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       letter-spacing: 1px;
       text-align: center;
     }
 
     input[type="number"],
     input[type="file"],
+    input[type="text"],
     select,
     textarea {
       width: 100%;
@@ -824,6 +828,7 @@ body, html {
 
     input[type="number"]:focus,
     input[type="file"]:focus,
+    input[type="text"]:focus,
     select:focus,
     textarea:focus {
       outline: none;
@@ -1065,5 +1070,84 @@ body, html {
   background: transparent;
   border:2px dashed var(--NuclearFuscia);
 box-shadow: 0 4px 20px var(--PlasmaPurple);
+
+}
+
+
+.notes-panel {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  background-image: url('/sprites/notepad.png');
+  border-radius: 10px;
+  padding: 5px;
+  padding-top: 105px;
+  min-width: 420px;
+  max-width: 420px;
+  min-height: 575px;
+  max-height: 575px;
+  z-index: 999;
+}
+
+.notes-content {
+  transition: all 0.3s ease;
+  max-height: 450px;
+  min-height: 450px;
+  overflow: hidden;
+  font-size: 1.2rem;
+
+}
+
+.notes-content.hidden {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+  margin: 0;
+  visibility: hidden;
+}
+
+.notes-panel:has(.notes-content.hidden) {
+  min-width: 0;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.notes-panel .panel-toggle {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  background: transparent;
+  border: 2px solid var(--CoolGray);
+  color: #0a0a0a;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.notes-panel .panel-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(103, 254, 189, 0.8);
+}
+
+.notes-panel .panel-toggle.collapsed {
+  background: transparent;
+}
+
+.pencil-img  {
+  width: 60px;
+  height: 60px;
+  top: 50%;
+  mask: none !important;
+  -webkit-mask: none !important;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
 
 }

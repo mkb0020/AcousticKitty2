@@ -283,3 +283,15 @@ document.getElementById("arcMovingToggle").addEventListener("change", e => {
 document.getElementById("arcRecordedToggle").addEventListener("change", e => {
   window.arcSettings.showRecorded = e.target.checked;
 });
+
+
+//============================ NOTEPAD ============================
+const toggleNotesPanel = document.getElementById('toggleNotesPanel');
+const notesContent = document.querySelector('.notes-content');
+
+if (toggleNotesPanel && notesContent) {
+  toggleNotesPanel.addEventListener('click', () => {
+    notesContent.classList.toggle('hidden');
+    toggleNotesPanel.classList.toggle('collapsed');
+  });
+}

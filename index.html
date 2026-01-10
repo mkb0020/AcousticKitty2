@@ -85,6 +85,19 @@
     </div>
   </div>
 
+  <div class="notes-panel">
+    <button id="toggleNotesPanel" class="panel-toggle" title="Toggle Notes"><img src="public/sprites/pencil.png" alt="NOTES" class="pencil-img"></button>
+  <div class="notes-content">
+    <div class="control-row">
+    </div>
+    <textarea 
+      id="levelNotes" 
+      placeholder="Add notes about your level design here... (exports with JSON)"
+      style="width: 100%; min-height: 200px; background: rgba(10, 10, 10, 0.8); color: #67FEBD; border: 1px solid rgba(103, 254, 189, 0.3); border-radius: 5px; padding: 10px; font-family: 'Orbitron', monospace; font-size: 12px; resize: vertical;"
+    ></textarea>
+  </div>
+</div>
+
   <div class="container">
       <div class="tab-container">
         <button class="tab-button active" data-tab="map">LEVEL PLANNER</button>
@@ -110,10 +123,18 @@
               <input id="numPlatforms" type="number" value="3" min="0">
             </div>
             <div class="control-group">
-              <label for="numHoles"># of Holes</label>
-              <input id="numHoles" type="number" value="1" min="0">
+              <label for="numGroundSegments"># of Ground Segments</label>
+              <input id="numGroundSegments" type="number" value="2" min="0">
             </div>
             
+          <div style="margin-top: 20px;">
+            <label>Number of Zones:</label>
+            <input type="number" id="numZones" min="0" max="20" value="0" style="width: 100%;">
+          </div>
+
+          <div id="dynamicZones" style="margin-top: 15px;"></div>
+
+
             <div class="control-group">
               <label for="platformColor">Platform Color</label>
               <div class="color-select-wrapper">
@@ -154,6 +175,7 @@
             <div id="dynamicInputs"></div>
             
             <button id="generateLevel">GENERATE LEVEL</button>
+            <button id="previewLevel">PREVIEW FULL LEVEL</button>
             <button id="exportJson">EXPORT JSON</button>
           </div>
         </div>
