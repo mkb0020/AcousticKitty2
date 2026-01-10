@@ -219,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 //============================ GRID CONTROLS ============================
-//============================ GRID CONTROLS ============================
 const gridToggle = document.getElementById('gridToggle');
 const gridSizeSlider = document.getElementById('gridSize');
 const gridSizeValue = document.getElementById('gridSizeValue');
