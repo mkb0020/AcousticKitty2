@@ -12,16 +12,14 @@ const starsDiv = document.getElementById('stars');
     }
 //============================ PLATFORM AND GROUND COLORS ============================
 const platformSelect = document.getElementById('platformColor');
-const groundSelect = document.getElementById('groundColor');
 const platformSwatch = document.getElementById('platformSwatch');
-const groundSwatch = document.getElementById('groundSwatch');
+
 
     function updateSwatch(select, swatch) {
       swatch.style.background = select.value;
     }
 
     platformSelect.addEventListener('change', () => updateSwatch(platformSelect, platformSwatch));
-    groundSelect.addEventListener('change', () => updateSwatch(groundSelect, groundSwatch));
 
 
 //============================ TABS ============================
