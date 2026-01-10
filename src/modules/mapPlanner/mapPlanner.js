@@ -1,4 +1,5 @@
 // mapPlanner
+
 import { levelData, updateLevelData } from '../shared/levelData.js';
 import { GROUND_Y, GROUND_HEIGHT, COW_WIDTH, COW_HEIGHT, COW_FRAME_COUNT, ABDUCTION_SPEED } from '../shared/constants.js';
 import { UFO } from './ufo.js';
@@ -47,6 +48,7 @@ export class MapPlanner {
     this.generateBtn = document.getElementById('generateLevel');
     this.exportBtn = document.getElementById('exportJson');
     this.jsonUploadInput = document.getElementById('jsonUpload');
+    this.previewLevelBtn = document.getElementById('previewLevel');
   }
 
   initEventListeners() {
@@ -55,6 +57,7 @@ export class MapPlanner {
     this.numZonesInput.addEventListener('input', () => this.createZoneInputs());
     this.generateBtn.onclick = () => this.generateLevel();
     this.exportBtn.onclick = () => this.exportJson();
+    this.previewLevelBtn.onclick = () => this.generateFullLevelPreview();
     this.jsonUploadInput.addEventListener('change', (e) => this.handleJsonUpload(e));
     
     this.canvas.addEventListener('mousemove', (e) => {
@@ -64,8 +67,13 @@ export class MapPlanner {
     });
     
     window.addEventListener("keydown", e => {
-      if (e.key === " " || e.key === "Space") {
+      if (e.key === " " || e.key === "Space" || 
+          e.key === "ArrowUp" || e.key === "ArrowDown" || 
+          e.key === "ArrowLeft" || e.key === "ArrowRight") {
         e.preventDefault();
+      }
+      
+      if (e.key === " " || e.key === "Space") {
         if (!this.keys[" "]) this.spaceJustPressed = true;
       }
       this.keys[e.key] = true;
@@ -84,13 +92,15 @@ export class MapPlanner {
 
     if (numP > 0) {
       html += '<div style="margin-bottom: 20px;"><h3 style="color: #67FEBD; margin-bottom: 10px;">Platforms</h3>';
-      html += '<div class="row"><div class="label-header">X</div><div class="label-header">Y</div><div class="label-header">Width</div><div class="label-header">Height</div></div>';
+      html += '<div class="row" style="grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1.5fr;"><div class="label-header">#</div><div class="label-header">X</div><div class="label-header">Y</div><div class="label-header">Width</div><div class="label-header">Height</div><div class="label-header">Tag</div></div>';
       for (let i = 0; i < numP; i++) {
-        html += `<div class="row">
+        html += `<div class="row" style="grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1.5fr;">
+          <div style="color: #67FEBD; font-weight: bold; display: flex; align-items: center; justify-content: center;">${i}</div>
           <input type="number" class="plat-x" value="${i === 0 ? 300 : 0}" step="10">
           <input type="number" class="plat-y" value="300" step="10">
           <input type="number" class="plat-w" value="150" min="10" step="10">
           <input type="number" class="plat-h" value="20" min="10" step="10">
+          <input type="text" class="plat-tag" placeholder="default" value="">
         </div>`;
       }
       html += '</div>';
@@ -165,6 +175,7 @@ export class MapPlanner {
               document.querySelectorAll('.plat-y')[i].value = data.platforms[i].y || 300;
               document.querySelectorAll('.plat-w')[i].value = data.platforms[i].w || data.platforms[i].width || 150;
               document.querySelectorAll('.plat-h')[i].value = data.platforms[i].h || data.platforms[i].height || 20;
+              document.querySelectorAll('.plat-tag')[i].value = data.platforms[i].tag || '';
             }
           });
         }
@@ -203,11 +214,13 @@ export class MapPlanner {
 
     const platforms = [];
     document.querySelectorAll('.plat-x').forEach((el, i) => {
+      const tag = document.querySelectorAll('.plat-tag')[i].value.trim();
       platforms.push({
         x: parseFloat(el.value) || 0,
         y: parseFloat(document.querySelectorAll('.plat-y')[i].value) || 300,
         w: Math.max(10, parseFloat(document.querySelectorAll('.plat-w')[i].value) || 150),
-        h: Math.max(10, parseFloat(document.querySelectorAll('.plat-h')[i].value) || 20)
+        h: Math.max(10, parseFloat(document.querySelectorAll('.plat-h')[i].value) || 20),
+        tag: tag || 'default'
       });
     });
 
@@ -249,11 +262,86 @@ export class MapPlanner {
     this.spawnCows();
   }
 
+  generateFullLevelPreview() {
+    const previewCanvas = document.createElement('canvas');
+    previewCanvas.width = levelData.levelLength;
+    previewCanvas.height = this.canvas.height;
+    const previewCtx = previewCanvas.getContext('2d');
+    
+    previewCtx.fillStyle = '#0a0a0a';
+    previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+    
+    const tempRenderer = new MapRenderer(previewCtx, previewCanvas);
+    
+    tempRenderer.drawZones(levelData.zones);
+    tempRenderer.drawGround(levelData.groundSegments);
+    tempRenderer.drawPlatforms(levelData.platforms, this.platformColor, true);
+    
+    const dataURL = previewCanvas.toDataURL('image/png');
+    this.showPreviewModal(dataURL);
+  }
+
+  showPreviewModal(imageDataURL) {
+    let modal = document.getElementById('previewModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'previewModal';
+      modal.className = 'modal';
+      modal.style.display = 'none';
+      
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 95%; max-height: 95vh; overflow: auto;">
+          <div class="modal-header">
+            <h1 class="modal-title">FULL LEVEL PREVIEW</h1>
+            <button class="modal-close" id="closePreviewModal">X</button>
+          </div>
+          <div class="modal-body" style="text-align: center; padding: 20px;">
+            <img id="previewImage" style="width: 100%; height: auto; border: 2px solid #67FEBD; border-radius: 8px;" />
+            <div style="margin-top: 20px;">
+              <button id="downloadPreviewBtn" style="background: #67FEBD; color: #0a0a0a; border: none; padding: 12px 24px; font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 14px;">
+                DOWNLOAD IMAGE
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      const closeBtn = modal.querySelector('#closePreviewModal');
+      closeBtn.onclick = () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      };
+      
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      };
+      
+      const downloadBtn = modal.querySelector('#downloadPreviewBtn');
+      downloadBtn.onclick = () => {
+        const img = modal.querySelector('#previewImage');
+        const a = document.createElement('a');
+        a.href = img.src;
+        a.download = 'level-preview.png';
+        a.click();
+      };
+    }
+    
+    const img = modal.querySelector('#previewImage');
+    img.src = imageDataURL;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
   exportJson() {
     const data = {
       GroundSegments: levelData.groundSegments,
       platforms: levelData.platforms.map(p => ({
-        x: p.x, y: p.y, w: p.w, h: p.h
+        x: p.x, y: p.y, w: p.w, h: p.h, tag: p.tag
       })),
       zones: levelData.zones
     };
@@ -335,7 +423,7 @@ export class MapPlanner {
       this.renderer.drawZones(levelData.zones);
       this.renderer.drawGrid(this.camera);
       this.renderer.drawGround(levelData.groundSegments);
-      this.renderer.drawPlatforms(levelData.platforms, this.platformColor);
+      this.renderer.drawPlatforms(levelData.platforms, this.platformColor, true);
       this.renderer.drawCows(this.cows, this.ufo, this.cowSpriteSheet, this.cowFrameWidth, this.cowFrameHeight, this.cowSpriteLoaded);
       this.ufo.draw(this.ctx);
     });

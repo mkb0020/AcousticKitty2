@@ -44,9 +44,14 @@ export class PhysicsTester {
     });
     
     window.addEventListener("keydown", e => {
+      if (e.key === " " || e.key === "Space" || 
+          e.key === "ArrowUp" || e.key === "ArrowDown" || 
+          e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault();
+      }
+      
       this.keys[e.key] = true;
       if (e.key === "r" || e.key === "R") this.resetPlayer();
-      if (e.key === " ") e.preventDefault();
       if (e.key === "m" || e.key === "M") this.previewJumpDir = 1;
       if (e.key === "n" || e.key === "N") this.previewJumpDir = -1;
     });

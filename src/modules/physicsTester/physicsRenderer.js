@@ -20,6 +20,19 @@ export class PhysicsRenderer {
     this.ctx.restore();
   }
 
+  drawZones(zones) {
+    if (zones && zones.length > 0) {
+      zones.forEach(zone => {
+        this.ctx.fillStyle = zone.color + '4D';
+        this.ctx.fillRect(zone.start, 0, zone.end - zone.start, this.canvas.height);
+        
+        this.ctx.fillStyle = zone.color;
+        this.ctx.font = "bold 16px Orbitron";
+        this.ctx.fillText(zone.label, zone.start + 10, 30);
+      });
+    }
+  }
+
   drawGrid(camera) {
     if (window.gridSettings && window.gridSettings.enabled) {
       const gridSize = window.gridSettings.size;
@@ -42,19 +55,6 @@ export class PhysicsRenderer {
         this.ctx.lineTo(endX, y);
         this.ctx.stroke();
       }
-    }
-  }
-
-  drawZones(zones) {
-    if (zones && zones.length > 0) {
-      zones.forEach(zone => {
-        this.ctx.fillStyle = zone.color + '4D'; 
-        this.ctx.fillRect(zone.start, 0, zone.end - zone.start, this.canvas.height);
-        
-        this.ctx.fillStyle = zone.color;
-        this.ctx.font = "bold 16px Orbitron";
-        this.ctx.fillText(zone.label, zone.start + 10, 30);
-      });
     }
   }
 
@@ -87,10 +87,41 @@ export class PhysicsRenderer {
     }
   }
 
+  getPlatformColor(tag) {
+    const tagColors = {
+      'item': '#FFD700',
+      'coin': '#FFD700',
+      'powerup': '#FFD700',
+      'moving': '#00BFFF',
+      'breakable': '#FF4500',
+      'hazard': '#FF0000',
+      'checkpoint': '#00FF00',
+      'default': '#dc4ce8'
+    };
+    
+    return tagColors[tag.toLowerCase()] || '#dc4ce8';
+  }
+
   drawPlatforms(platforms) {
-    platforms.forEach(p => {
-      this.ctx.fillStyle = "#dc4ce8";
+    platforms.forEach((p, index) => {
+      const color = this.getPlatformColor(p.tag || 'default');
+      this.ctx.fillStyle = color;
       this.ctx.fillRect(p.x, p.y, p.w, p.h);
+      
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.font = 'bold 14px Orbitron';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(index.toString(), p.x + p.w / 2, p.y + p.h / 2);
+      
+      if (p.tag && p.tag !== 'default') {
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.font = '10px Orbitron';
+        this.ctx.fillText(p.tag, p.x + p.w / 2, p.y + p.h / 2 + 12);
+      }
+      
+      this.ctx.textAlign = 'left';
+      this.ctx.textBaseline = 'alphabetic';
     });
   }
 
@@ -206,7 +237,6 @@ export class PhysicsRenderer {
     this.ctx.lineTo(startX, arc.apex.y);
     this.ctx.stroke();
 
-    
     this.ctx.beginPath();
     this.ctx.moveTo(startX, GROUND_Y);
     this.ctx.lineTo(maxX, GROUND_Y);

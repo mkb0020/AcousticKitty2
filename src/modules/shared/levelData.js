@@ -1,10 +1,10 @@
 // LEVEL DATA
-
 export const levelData = {
   platforms: [],
   groundSegments: [],
-  levelLength: 10000,
-  zones: []
+  levelLength: 15000,
+  zones: [],
+  notes: ''
 };
 
 export function updateLevelData(newData) {
@@ -14,6 +14,7 @@ export function updateLevelData(newData) {
 export function resetLevelData() {
   levelData.platforms = [];
   levelData.groundSegments = [];
-  levelData.levelLength = 10000;
+  levelData.levelLength = 15000;
   levelData.zones = [];
+  levelData.notes = '';
 }
