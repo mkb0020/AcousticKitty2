@@ -125,7 +125,6 @@ export class PhysicsTester {
     this.camera.x += (targetCameraX - this.camera.x) * 0.1;
     this.camera.x = Math.max(0, this.camera.x);
 
-    // RECORD JUMP ARC
     if (!this.player.onGround) {
       this.jumpTrail.push({
         x: this.player.x + this.player.w / 2,
@@ -147,6 +146,7 @@ export class PhysicsTester {
     
     this.renderer.clear();
     this.renderer.drawWithCamera(this.camera, () => {
+      this.renderer.drawZones(levelData.zones);
       this.renderer.drawGrid(this.camera);
       this.renderer.drawGround(this.camera);
       this.renderer.drawPlatforms(levelData.platforms);

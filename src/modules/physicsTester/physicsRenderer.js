@@ -1,6 +1,7 @@
 // PHYSICS RENDERER
 
 import { GROUND_Y } from '../shared/constants.js';
+import { levelData } from '../shared/levelData.js';
 
 export class PhysicsRenderer {
   constructor(ctx, canvas) {
@@ -44,21 +45,45 @@ export class PhysicsRenderer {
     }
   }
 
-  drawGround(camera) {
-    const groundWidth = this.canvas.width * 2;
-    const groundHeight = this.canvas.height - GROUND_Y;
-    const gradient = this.ctx.createLinearGradient(0, GROUND_Y, 0, this.canvas.height);
-    gradient.addColorStop(0, '#2d5016');
-    gradient.addColorStop(1, '#1a2f0d');
-    this.ctx.fillStyle = gradient;
-    this.ctx.fillRect(camera.x, GROUND_Y, groundWidth, groundHeight);
+  drawZones(zones) {
+    if (zones && zones.length > 0) {
+      zones.forEach(zone => {
+        this.ctx.fillStyle = zone.color + '4D'; 
+        this.ctx.fillRect(zone.start, 0, zone.end - zone.start, this.canvas.height);
+        
+        this.ctx.fillStyle = zone.color;
+        this.ctx.font = "bold 16px Orbitron";
+        this.ctx.fillText(zone.label, zone.start + 10, 30);
+      });
+    }
+  }
 
-    this.ctx.fillStyle = '#3d6020';
-    const grassDensity = Math.ceil(groundWidth / 100);
-    for (let i = 0; i < grassDensity; i++) {
-      const x = camera.x + (i / grassDensity) * groundWidth;
-      this.ctx.fillRect(x, GROUND_Y + 10, 30, 5);
-      this.ctx.fillRect(x + 20, GROUND_Y + 30, 40, 3);
+  drawGround(camera) {
+    const visibleStart = camera.x;
+    const visibleEnd = camera.x + this.canvas.width;
+    
+    const dangerGradient = this.ctx.createLinearGradient(0, GROUND_Y, 0, this.canvas.height);
+    dangerGradient.addColorStop(0, '#8B0000');
+    dangerGradient.addColorStop(1, '#4B0000');
+    this.ctx.fillStyle = dangerGradient;
+    this.ctx.fillRect(visibleStart, GROUND_Y, visibleEnd - visibleStart, this.canvas.height - GROUND_Y);
+    
+    if (levelData.groundSegments && levelData.groundSegments.length > 0) {
+      levelData.groundSegments.forEach(seg => {
+        const gradient = this.ctx.createLinearGradient(0, seg.y, 0, seg.y + seg.height);
+        gradient.addColorStop(0, '#2d5016');
+        gradient.addColorStop(1, '#1a2f0d');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(seg.x, seg.y, seg.width, seg.height);
+
+        this.ctx.fillStyle = '#3d6020';
+        const grassDensity = Math.ceil(seg.width / 100);
+        for (let i = 0; i < grassDensity; i++) {
+          const x = seg.x + (i / grassDensity) * seg.width;
+          this.ctx.fillRect(x, seg.y + 10, 30, 5);
+          this.ctx.fillRect(x + 20, seg.y + 30, 40, 3);
+        }
+      });
     }
   }
 
@@ -92,7 +117,6 @@ export class PhysicsRenderer {
   }
 
   drawStandingPredictionArc(arc) {
-    // JUMP ARC
     this.ctx.strokeStyle = "rgb(131, 12, 222)";
     this.ctx.lineWidth = 2;
     this.ctx.beginPath();
@@ -109,13 +133,11 @@ export class PhysicsRenderer {
       this.ctx.fill();
     });
 
-    // APEX
     this.ctx.fillStyle = "rgb(255, 120, 255)";
     this.ctx.beginPath();
     this.ctx.arc(arc.apex.x, arc.apex.y, 5, 0, Math.PI * 2);
     this.ctx.fill();
 
-    // LANDING
     if (arc.landing) {
       this.ctx.fillStyle = "rgb(180, 120, 255)";
       this.ctx.beginPath();
@@ -123,7 +145,6 @@ export class PhysicsRenderer {
       this.ctx.fill();
     }
 
-    // LABELS
     this.ctx.font = "12px Orbitron";
     this.ctx.fillStyle = "rgba(220, 200, 255, 0.95)";
 
@@ -156,7 +177,6 @@ export class PhysicsRenderer {
     const startX = player.x + player.w / 2;
     const startY = player.y + player.h;
 
-    // ARC
     this.ctx.strokeStyle = "rgba(103, 254, 189, 0.8)";
     this.ctx.lineWidth = 2;
     this.ctx.beginPath();
@@ -166,31 +186,27 @@ export class PhysicsRenderer {
     });
     this.ctx.stroke();
 
-    // APEX
     this.ctx.fillStyle = "#dc4ce8";
     this.ctx.beginPath();
     this.ctx.arc(arc.apex.x, arc.apex.y, 5, 0, Math.PI * 2);
     this.ctx.fill();
 
-    // MAX X
     const maxX = arc.landing ? arc.landing.x : arc.points[arc.points.length - 1]?.x || startX;
     this.ctx.fillStyle = "#67FEBD";
     this.ctx.beginPath();
     this.ctx.arc(maxX, GROUND_Y, 5, 0, Math.PI * 2);
     this.ctx.fill();
 
-    // GUIDE LINES
     this.ctx.setLineDash([6, 6]);
     this.ctx.strokeStyle = "rgba(220, 76, 232, 0.6)";
     this.ctx.lineWidth = 1;
 
-    // HEIGHT
     this.ctx.beginPath();
     this.ctx.moveTo(startX, startY);
     this.ctx.lineTo(startX, arc.apex.y);
     this.ctx.stroke();
 
-    // DISTANCE
+    
     this.ctx.beginPath();
     this.ctx.moveTo(startX, GROUND_Y);
     this.ctx.lineTo(maxX, GROUND_Y);
@@ -198,7 +214,6 @@ export class PhysicsRenderer {
 
     this.ctx.setLineDash([]);
 
-    // LABELS
     this.ctx.fillStyle = "rgba(220, 76, 232, 0.9)";
     this.ctx.font = "12px Orbitron";
     this.ctx.fillText(
