@@ -1,43 +1,43 @@
-
 //============================ STAR BACKGROUND  ============================
 const starsDiv = document.getElementById('stars');
-    for (let i = 0; i < 200; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.width = star.style.height = Math.random() * 2 + 'px';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.animationDelay = Math.random() * 4 + 's';
-      starsDiv.appendChild(star);
-    }
+for (let i = 0; i < 200; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.width = star.style.height = Math.random() * 2 + 'px';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.animationDelay = Math.random() * 4 + 's';
+  starsDiv.appendChild(star);
+}
+
 //============================ PLATFORM AND GROUND COLORS ============================
 const platformSelect = document.getElementById('platformColor');
 const platformSwatch = document.getElementById('platformSwatch');
 
+function updateSwatch(select, swatch) {
+  swatch.style.background = select.value;
+}
 
-    function updateSwatch(select, swatch) {
-      swatch.style.background = select.value;
-    }
+platformSelect.addEventListener('change', () => updateSwatch(platformSelect, platformSwatch));
 
-    platformSelect.addEventListener('change', () => updateSwatch(platformSelect, platformSwatch));
-
-
-//============================ TABS ============================
-const tabButtons = document.querySelectorAll('.tab-button');
+//============================ TABS (NOW IN NAVBAR) ============================
+const tabNavButtons = document.querySelectorAll('.tab-nav-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 
-tabButtons.forEach(button => {
+window.activeTab = 'map';
+
+tabNavButtons.forEach(button => {
   button.addEventListener('click', () => {
     const targetTab = button.dataset.tab;
+    window.activeTab = targetTab; 
     
-    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabNavButtons.forEach(btn => btn.classList.remove('active'));
     tabContents.forEach(content => content.classList.remove('active'));
     
     button.classList.add('active');
     document.getElementById(targetTab + 'Tab').classList.add('active');
   });
 });
-
 
 /* ===============================
  MODAL STUFF
@@ -191,41 +191,14 @@ document.addEventListener('DOMContentLoaded', () => {
       hideBackToTop();
     }
   });
-
-
-// ==================== LEFT DROPDOWN MENU ====================
-    const menuTrigger = document.querySelector('.menu-trigger');
-    const leftDropdown = document.querySelector('.left-dropdown');
-
-    if (menuTrigger && leftDropdown) {
-        menuTrigger.onclick = (e) => {
-            e.stopPropagation();
-            leftDropdown.classList.toggle('active');
-        };
-
-        document.addEventListener('click', () => {
-            leftDropdown.classList.remove('active');
-        });
-
-        document.querySelector('.left-menu')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-    }
-
 });
-
-
-
-
 
 //============================ GRID CONTROLS ============================
 const gridToggle = document.getElementById('gridToggle');
 const gridSizeSlider = document.getElementById('gridSize');
 const gridSizeValue = document.getElementById('gridSizeValue');
-const toggleGridPanel = document.getElementById('toggleGridPanel');
+const navToggleGrid = document.getElementById('navToggleGrid');
 const gridControlsContent = document.querySelector('.grid-controls-content');
-
-
 
 window.gridSettings = {
   enabled: true,
@@ -245,10 +218,9 @@ if (gridSizeSlider && gridSizeValue) {
   });
 }
 
-if (toggleGridPanel && gridControlsContent) {
-  toggleGridPanel.addEventListener('click', () => {
+if (navToggleGrid && gridControlsContent) {
+  navToggleGrid.addEventListener('click', () => {
     gridControlsContent.classList.toggle('hidden');
-    toggleGridPanel.classList.toggle('collapsed');
   });
 }
 
@@ -284,14 +256,12 @@ document.getElementById("arcRecordedToggle").addEventListener("change", e => {
   window.arcSettings.showRecorded = e.target.checked;
 });
 
-
 //============================ NOTEPAD ============================
-const toggleNotesPanel = document.getElementById('toggleNotesPanel');
+const navToggleNotes = document.getElementById('navToggleNotes');
 const notesContent = document.querySelector('.notes-content');
 
-if (toggleNotesPanel && notesContent) {
-  toggleNotesPanel.addEventListener('click', () => {
+if (navToggleNotes && notesContent) {
+  navToggleNotes.addEventListener('click', () => {
     notesContent.classList.toggle('hidden');
-    toggleNotesPanel.classList.toggle('collapsed');
   });
 }

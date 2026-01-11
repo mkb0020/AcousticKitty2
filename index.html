@@ -14,29 +14,77 @@
 
   <nav class="navbar">
     <div class="nav-container">
-      <div class="left-dropdown"> <!-- NOT ACTUALLY A DROP DOWN AT THE MOMENT - KEEPING THE DROP DOWN TAG FOR FUTURE PLANS -->
-          <img src="/sprites/Niels2.png" alt="Menu" class="nav-niels">
-      </div>
-       <a href="https://mkb0020.github.io"> <!-- PLACEHOLDER -->
-            <div class="logo">♡ ACOUSTIC KITTY ♡</div>
-        </a>
-      <div class="help-dropdown">
-        <button class="help-icon" id="helpBtn" aria-label="Help Menu">
-          <div class="question-mark">?</div>
+      <!-- LEFT SECTION: NAV -->
+      <div class="nav-section nav-left">
+        <img src="/sprites/Niels2.png" alt="Niels" class="nav-niels" title="Niels">
+        <!--<button class="nav-icon-btn" id="homeBtn" title="Home">
+          <span class="icon-text">🏠</span>
+          <span class="hover-text">HOME</span>
+        </button>-->
+        <button class="nav-icon-btn tab-nav-btn active" data-tab="map" title="Level Planner">
+          <span class="icon-text"><img src="/sprites/UFO2.gif" alt="MAP PLANNER" class="nav-niels" title="MAP PLANNER"></span>
+          <span class="hover-text">MAP PLANNER</span>
         </button>
-        <div class="dropdown-menu" id="dropdownMenu">
-          <button id="openMainHelp">GUIDE</button>
-          <button id="openGuide">SUPPORT</button>
+        <button class="nav-icon-btn tab-nav-btn" data-tab="physics" title="Physics Tester">
+          <span class="icon-text"><img src="/sprites/physics.gif" alt="TEST PHYSICS" class="nav-niels" title="TEST PHYSICS"></span>
+          <span class="hover-text">TEST PHYSICS</span>
+        </button>
+      </div>
+
+      <!-- CENTER SECTION: LOGO -->
+      <div class="nav-section nav-center">
+        <div class="logo">♡ ACOUSTIC KITTY ♡</div>
+      </div>
+
+      <!-- RIGHT SECTION: TOOLS -->
+      <div class="nav-section nav-right">
+        <button class="nav-icon-btn" id="navToggleGrid" title="Grid Controls">
+          <span class="icon-text"><img src="/sprites/controls.gif" alt="CONTROLS" class="nav-niels" title="CONTROLS"></span>
+          <span class="hover-text">CONTROLS</span>
+        </button>
+        <button class="nav-icon-btn" id="navToggleNotes" title="Notes">
+          <span class="icon-text"><span class="icon-text"><img src="/sprites/pencil2.png" alt="NOTES" class="nav-niels" title="NOTES"></span>
+          <span class="hover-text">NOTES</span>
+        </button>
+        <button class="nav-icon-btn" id="generateLevel" title="Generate Level">
+          <span class="icon-text">🔨</span>
+          <span class="hover-text">GENERATE</span>
+        </button>
+        <button class="nav-icon-btn" id="previewLevel" title="Preview Level">
+          <span class="icon-text">👁️</span>
+          <span class="hover-text">PREVIEW</span>
+        </button>
+        <button class="nav-icon-btn" id="exportJson" title="Export JSON">
+          <span class="icon-text">💾</span>
+          <span class="hover-text">EXPORT</span>
+        </button>
+        <button class="nav-icon-btn" id="resetLevel" title="Reset Level">
+          <span class="icon-text"><img src="/sprites/resetLevel.gif" alt="RESET LEVEL" class="nav-niels" title="RESET LEVEL"></span>
+          <span class="hover-text">RESET LEVEL</span>
+        </button>
+        <button class="nav-icon-btn" id="loadPhysics" title="Load Physics">
+          <span class="icon-text"><img src="/sprites/physics.gif" alt="LOAD PHYSICS" class="nav-niels" title="LOAD PHYSICS"></span>
+          <span class="hover-text">LOAD PHYSICS</span>
+        </button>
+        <button class="nav-icon-btn" id="resetPlayer" title="Reset Player">
+          <span class="icon-text"><img src="/sprites/resetSprite.gif" alt="RESET PLAYER" class="nav-niels" title="RESET PLAYER"></span>
+          <span class="hover-text">RESET PLAYER</span>
+        </button>
+        <div class="help-dropdown">
+          <button class="help-icon" id="helpBtn" aria-label="Help Menu">
+            <div class="question-mark">?</div>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <button id="openMainHelp">GUIDE</button>
+            <button id="openGuide">SUPPORT</button>
+          </div>
         </div>
       </div>
     </div>
   </nav>
 
   <div class="grid-controls">
-      <button id="toggleGridPanel" class="panel-toggle" title="Toggle Grid Controls">
-        <img src="public/sprites/controls.gif" alt="CONTROLS" class="controls-gif">
-      </button>
-    <div class="grid-controls-content">
+    <div class="grid-controls-content hidden">
       <div class="control-row">
           <span class="divider-label">CANVAS </span>
       </div>
@@ -86,26 +134,18 @@
   </div>
 
   <div class="notes-panel">
-    <button id="toggleNotesPanel" class="panel-toggle" title="Toggle Notes"><img src="public/sprites/pencil2.png" alt="NOTES" class="pencil-img"></button>
-  <div class="notes-content">
-    <div class="control-row">
+    <div class="notes-content hidden">
+      <div class="control-row">
+      </div>
+      <textarea 
+        id="levelNotes" 
+        placeholder="Add notes about your level design here... (exports with JSON)"
+        style="width: 100%; min-height: 200px; background: rgba(10, 10, 10, 0.8); color: #67FEBD; border: 1px solid rgba(103, 254, 189, 0.3); border-radius: 5px; padding: 10px; font-family: 'Orbitron', monospace; font-size: 12px; resize: vertical;"
+      ></textarea>
     </div>
-    <textarea 
-      id="levelNotes" 
-      placeholder="Add notes about your level design here... (exports with JSON)"
-      style="width: 100%; min-height: 200px; background: rgba(10, 10, 10, 0.8); color: #67FEBD; border: 1px solid rgba(103, 254, 189, 0.3); border-radius: 5px; padding: 10px; font-family: 'Orbitron', monospace; font-size: 12px; resize: vertical;"
-    ></textarea>
   </div>
-</div>
 
   <div class="container">
-      <div class="tab-container">
-        <!--CHANGE THESE TO SMALLER ICONS RATHER THAN BIG  BUTTONS-->
-        <button class="tab-button active" data-tab="map">LEVEL PLANNER</button> 
-        <button class="tab-button" data-tab="physics">PHYSICS TESTER</button>
-        <button class="tab-button" data-tab="PLACEHOLDER">BACK TO MENU</button>
-      </div>
-
       <div id="mapTab" class="tab-content active">
         <div class="canvas-container">
           <canvas id="mapCanvas" width="1000" height="480"></canvas>
@@ -135,7 +175,6 @@
 
           <div id="dynamicZones" style="margin-top: 15px;"></div>
 
-
             <div class="control-group">
               <label for="platformColor">Platform Color</label>
               <div class="color-select-wrapper">
@@ -159,10 +198,6 @@
                 <div id="platformSwatch" class="color-swatch" style="background: #dc4ce8;"></div>
               </div>
             </div>
-
-            <div class="control-group">
-
-            </div>
           </div>
 
           <div class="input-box">
@@ -174,11 +209,6 @@
             </div>
 
             <div id="dynamicInputs"></div>
-  
-            <button id="generateLevel">GENERATE LEVEL</button>
-            <button id="previewLevel">PREVIEW FULL LEVEL</button>
-            <button id="exportJson">EXPORT JSON</button>
-            <button id="resetLevel" class="button">RESET LEVEL</button>
           </div>
         </div>
       </div>
@@ -216,9 +246,6 @@
               <label for="spriteH">Height (1-200)</label>
               <input type="number" id="spriteH" value="108" min="1" max="200">
             </div>
-
-            <button id="loadPhysics">LOAD & TEST PHYSICS</button>
-            <button id="resetPlayer">RESET PLAYER</button>
           </div>
         </div>
       </div>
@@ -229,7 +256,20 @@
           </a>
   </div>
 
-  </div>
+  
+</div>
+
+    <footer>
+        <p>&copy; 2026 Acoustic Kitty v2 by mkb0020. All Rights Reserved.</p>
+    </footer>
+
+  <!-- HIDDEN BUTTONS FOR BACKWARDS COMPATIBILITY -->
+  <button id="generateLevel" style="position: absolute; left: -9999px;"></button>
+  <button id="previewLevel" style="position: absolute; left: -9999px;"></button>
+  <button id="exportJson" style="position: absolute; left: -9999px;"></button>
+  <button id="resetLevel" style="position: absolute; left: -9999px;"></button>
+  <button id="loadPhysics" style="position: absolute; left: -9999px;"></button>
+  <button id="resetPlayer" style="position: absolute; left: -9999px;"></button>
 
   <div id="helpModal" class="modal">
       <div class="modal-content">

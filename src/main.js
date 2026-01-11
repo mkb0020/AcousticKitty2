@@ -9,17 +9,6 @@ console.log("Window loaded:", document.readyState);
 
 let mapPlanner = null;
 let physicsTester = null;
-let activeTab = 'map';
-
-// TAB SWITCH
-const tabButtons = document.querySelectorAll('.tab-button');
-tabButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const targetTab = button.dataset.tab;
-    if (targetTab === 'PLACEHOLDER') return;
-    activeTab = targetTab;
-  });
-});
 
 // INITIALIZE WHEN DOM IS READY
 function init() {
@@ -39,7 +28,6 @@ function init() {
     console.error("PhysicsTester init failed:", e);
   }
   
-
   animate();
 }
 
@@ -48,10 +36,10 @@ function animate() {
   requestAnimationFrame(animate);
   
   try {
-    if (activeTab === 'map' && mapPlanner) {
+    if (window.activeTab === 'map' && mapPlanner) {
       mapPlanner.update();
       mapPlanner.draw();
-    } else if (activeTab === 'physics' && physicsTester) {
+    } else if (window.activeTab === 'physics' && physicsTester) {
       physicsTester.update();
       physicsTester.draw();
     }
@@ -67,6 +55,6 @@ if (document.readyState === 'loading') {
   init();
 }
 
-//  DEBUGGING 
+// DEBUGGING 
 window.mapPlanner = mapPlanner;
 window.physicsTester = physicsTester;
